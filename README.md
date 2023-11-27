@@ -1,4 +1,4 @@
-# Financial OCR App
+# FinancialDocOCR App
 
 ## Description
 This project aims to create an OCR-based application for extracting financial data from PDF documents. The application undergoes a series of steps, including document upload, data preprocessing, OCR, table reconstruction, error detection, verification, and storage in MongoDB.
@@ -27,7 +27,7 @@ This project aims to create an OCR-based application for extracting financial da
 7. Verified financial data is stored in MongoDB for future reference.
 
 ## Data Preprocessing
-The preprocessing phase for table recognition and detection encompasses the following key steps: 
+### The preprocessing phase for table recognition and detection: 
 1. Document Upload: Users initiate the process by uploading the document containing tabular data.
 2. Image Compression: To optimize processing speed and resource utilization, the uploaded images undergo compression without compromising data integrity.
 3. Gray Scale Conversion: The images are converted to grayscale to simplify subsequent image processing operations.
@@ -37,7 +37,7 @@ The preprocessing phase for table recognition and detection encompasses the foll
 7. Lines Intersection Detection: Intersection points of detected lines are identified, contributing to the accurate delineation of table cells.
 8. Contours Detection: Contours are extracted from the binary images, outlining distinct shapes and structures present in the document.
 9. Cell Segmentation: Based on the identified contours, the system segments the document into individual cells, laying the groundwork for subsequent optical character recognition (OCR) processes.
-The preprocessing phase for cells recognition and detection encompasses the following key steps:
+### The preprocessing phase for cells recognition and detection:
 1. Binarization
 2. Top Hat Transformation: Applying the top-hat transformation helps in highlighting subtle details and fine structures within the document. This is particularly useful for improving the visibility of smaller elements, such as text and lines.
 3. Text Region Detection: The system identifies regions within the document that contain text with MSER tools. This step aims to isolate areas where cells and textual information coexist.
@@ -59,6 +59,17 @@ The application identifies errors in the financial data, such as discrepancies i
 
 ## Data Storage
 Verified financial data is stored in MongoDB, facilitating easy access and retrieval.
+## Deployment:
+
+The application is deployed using FastAPI, a modern, fast web framework for building APIs with Python. The deployment process involves the following steps:
+
+1. FastAPI Integration: The application is developed using FastAPI to create a robust and efficient API that serves as the backend for the OCR-based financial data extraction.
+2. Asynchronous Programming for Real-Time Updates: These techniques are employed to enhance the user experience by providing real-time updates on processing progress. This allows users to track the status of document processing as OCR runs in the background.
+
+3. Concurrent Error Detection and Correction: The system is designed to detect and correct errors concurrently with the OCR process. This ensures a proactive approach to handling errors in real-time, improving the overall accuracy and reliability of the financial data extraction.
+
+2. Visual Studio Code Integration: Visual Studio Code (VSCode) is the chosen Integrated Development Environment (IDE) for both development and deployment. VSCode's rich set of extensions and integrated terminal make it seamless to manage the codebase and deploy the FastAPI application.
+
 
 ## Dependencies
 - Python 3.9.13
