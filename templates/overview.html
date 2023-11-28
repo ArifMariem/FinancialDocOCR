@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block static%}
+<style>
+footer.footer {
+	position: unset !important; 
+    bottom: unset !important; 
+    left: unset !important; 
+    right: unset !important; 
+	background: #fff;
+    direction: ltr;
+    padding: 1rem 0.875rem;
+
+}
+p{
+	font-family: sans-serif;
+}
+.id{
+	font-size: 16px;
+}
+h4{
+	color: #495057;
+
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+			<main class="content">
+				<div class="container-fluid p-0">
+
+					<h2>Aperçu de l'Application OCR</h2>
+					
+
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+							    
+							</div>
+
+							<div class="card-body">
+							    <p class="id">Bienvenue! Cette application vous permet d'extraire automatiquement les données à partir de fichiers PDF numérisés des Comptes financiers. Elle offre un moyen simple et efficace de traiter de gros volumes de données tabulaires sans effort manuel.</p>
+
+							    <h4>Comment ça fonctionne ?</h4>
+							    <ol>
+							        <li>
+							            <strong>Chargement du fichier PDF :</strong>
+							            <p>Commencez par charger votre fichier PDF numérisé en cliquant sur le bouton "Télécharger le PDF" sur la page d'accueil.</p>
+							        </li>
+							        <li>
+							            <strong>Traitement du PDF :</strong>
+							            <p>Une fois le fichier PDF chargé, l'application procédera automatiquement au traitement du document. Ce processus peut prendre quelques instants, en fonction de la taille du fichier.</p>
+							        </li>
+							        <li>
+							            <strong>Segmentation des Pages et OCR :</strong>
+							            <p>L'application séparera chaque page du PDF et segmentera les tableaux présents sur chacune d'entre elles. Ensuite, elle effectuera une reconnaissance optique de caractères (OCR) sur chaque cellule du tableau pour extraire le texte.</p>
+							        </li>
+							        <li>
+							            <strong>Navigation entre les Pages :</strong>
+							            <p>Vous pouvez facilement naviguer entre les différentes pages du PDF pour vérifier les résultats obtenus par l'OCR.</p>
+							        </li>
+							        <li>
+							            <strong>Reconstruction des Données :</strong>
+							            <p>Une fois l'OCR terminée pour toutes les pages, l'application reconstruira les données sous forme de tableaux, prêts à être insérés dans la base de données.</p>
+							        </li>
+							        <li>
+							            <strong>Validation des Données et Insertion :</strong>
+							            <p>Vous aurez l'occasion de vérifier et de valider les données reconstruites avant de les insérer dans la base de données.</p>
+							        </li>
+							        <li>
+							            <strong>Sauvegarde dans la Base de Données :</strong>
+							            <p>Une fois que vous êtes satisfait(e) des données, l'application les insérera dans la base de données pour une utilisation ultérieure.</p>
+							        </li>
+							    </ol>
+
+							    <h4>Avantages de notre Application OCR</h4>
+							    <ul>
+							        <li>Gain de temps : L'application élimine la nécessité de saisir manuellement des données à partir de fichiers PDF, vous faisant gagner un temps précieux.</li>
+							        <li>Précision accrue : La reconnaissance optique de caractères garantit une précision élevée lors de l'extraction des données des tableaux.</li>
+							        <li>Facilité d'utilisation : Notre interface utilisateur intuitive rend l'application accessible même aux utilisateurs novices.</li>
+							        <li>Traitement en masse : Vous pouvez traiter de gros fichiers PDF contenant plusieurs pages et tableaux en une seule fois.</li>
+							    </ul>
+
+							    <p>Commencez dès maintenant en téléchargeant votre fichier PDF pour exploiter la puissance de notre application OCR ! Si vous avez besoin d'aide ou de plus d'informations, n'hésitez pas à consulter notre section d'aide ou à nous contacter.</p>
+							</div>
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</main>
+
+			{% endblock %}

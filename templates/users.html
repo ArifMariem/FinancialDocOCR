@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+Extraction Page
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Liste des Agents</h2>
+    
+<div>
+
+    
+    <div class="card flex-fill">
+        
+        <table class="table table-hover my-0">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th class="d-none d-md-table-cell">Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td class="d-none d-xl-table-cell">{{ user.username }}</td>
+                    <td class="d-none d-md-table-cell">{{ user.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+
+
+
+
+{% endblock %}

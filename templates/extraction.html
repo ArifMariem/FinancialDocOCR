@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+
+{% block title %}
+Extraction Page
+{% endblock %}
+
+
+{% block static %}
+
+<style>
+   footer.footer {
+    position: absolute !important; 
+      bottom: 0 !important; 
+      right:  0 !important; 
+    background: #fff;
+      direction: ltr;
+      padding: 1rem 0.875rem;
+  
+  }
+  #wrapper {    
+  padding-bottom: 100px; }
+.main {
+  padding-bottom: 100px;
+}
+
+#valider_tt{
+  padding-top: 50px;
+}
+.progress{
+  height: 40px;
+
+} 
+.custom-bg{
+background-color: rgb(137, 166, 166);  
+}
+.cramped {
+    width: auto; 
+  }
+  th, td {
+    white-space: nowrap;
+  }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5" id="wrapper">
+  <h2>Etape 2 : Reconaissance et extraction des cellules</h2>
+  
+    </style>
+    
+    <div class="progress">         
+      <div id="progress-bar" class="progress-bar custom-bg" 
+          style="width:0%;  border-radius: 10px;" 
+          role="progressbar" 
+          aria-valuenow="0" 
+          aria-valuemin="0" 
+          aria-valuemax="100">0% 
+      </div>         
+    </div>   
+    
+  
+  <div id="dataframe-container"> </div>
+  <div id="valider_tt"></div>
+
+</div>
+
+
+{% block footer %}			
+			{% endblock %}
+
+
+<script>
+
+let lastPageNumber;
+let municipalite; 
+let date;
+
+    const socket = new WebSocket(`ws://127.0.0.1:8000/ws?filename={{ filename }}&municipalite={{ municipalite }}&date={{ date }}`);
+    socket.onopen = () => {
+    const filename = "filename={{ filename }}";
+     municipalite = "{{ municipalite }}";
+     date = "{{ date }}";
+
+    console.log('Connected');
+
+    socket.send(`filename:${filename}&${municipalite}&${date}`);
+  };
+
+
+    var dict ={} ;
+        
+    socket.onmessage =(event) => {
+    const data = JSON.parse(event.data);
+    console.log("data is ", data)
+
+    
+    if (data.type === "progress") {
+      const progress = data.progress;
+      const progressBar = document.getElementById("progress-bar");
+
+      progressBar.style.width = `${progress}%`;
+
+      progressBar.innerText = `${progress}%` ;
+      progressBar.setAttribute("aria-valuenow", progress.toString());
+
+      if (progress === 100) {
+        const dfContain = document.getElementById("dataframe-container");
+      const lastTable = dfContain.querySelector("table:last-child");
+
+      // Extract the page number from the last table's id attribute
+      if (lastTable) {
+        const tableId = lastTable.getAttribute("id");
+        const pageNumberMatch = tableId.match(/page-(\d+)-table/);
+        if (pageNumberMatch) {
+            lastPageNumber = parseInt(pageNumberMatch[1]);
+            console.log("Last Page Number:", lastPageNumber);
+        }
+    }
+
+    lastPageNumber = lastPageNumber + 1;
+
+    let formHtml =
+        `<div style="text-align: center;">
+        <button id="insertButton" class="btn btn-secondary" onclick="validerdoc(${lastPageNumber}, '${municipalite}', '${date}')">Valider et inserer document</button>
+    </div>`;
+
+    const dfContainer = document.getElementById("valider_tt");
+    dfContainer.innerHTML = formHtml;
+
+
+
+    }
+
+
+    } else if (data.type === "dataframe") {
+
+      const pageNumber = data.page_number;
+      const dataframe = JSON.parse(data.dataframe);
+      
+    
+let tableHTML = `
+  <div class="container mt-4 card flex-fill" id="page-${pageNumber}-container" style="overflow-x: auto;">
+    <div class="card-header">    
+      <h3 style="padding-top: 10px;">Page ${pageNumber}</h3>
+
+    </div>
+    <table id="page-${pageNumber}-table" class="table table-hover my-0" style="padding-bottom: 10px;">
+      <thead>
+        <tr>
+          ${Object.keys(dataframe).map((col) => `<th>${col}</th>`).join("")}
+        </tr>
+      </thead>
+      <tbody>
+  ${Object.keys(dataframe[Object.keys(dataframe)[0]]).map((rowIndex) => {
+    return `<tr>${Object.keys(dataframe).map((col) => `<td contenteditable="true" onclick="handleCellClick(this)" class="cramped">${dataframe[col][rowIndex]}</td>`).join("")}</tr>`;
+  }).join("")}
+</tbody>
+
+    </table>
+    
+
+
+  </div>
+  
+
+`;
+
+let buttonHTML = `
+<button class="btn btn-secondary" onclick="addRow('${pageNumber}')">Ajouter ligne</button>
+    <button class="btn btn-secondary" onclick="addColumn('${pageNumber}')">Supprimer colonne</button>
+    <button class="btn btn-secondary" onclick="removeRow('${pageNumber}')">Supprimer ligne</button>
+    <button class="btn btn-secondary" onclick="removeColumn('${pageNumber}')">Supprimer colonne</button>
+    <button class="btn btn-secondary" onclick="validate('${pageNumber}')">Valider page</button>
+    <button class="btn btn-secondary" onclick="reinitialiser('${pageNumber}')">réinitialiser page</button>
+
+`;
+
+
+// Add the template to the array for the specified page number
+dict[pageNumber]=tableHTML;
+
+
+// Update the table content in the browser
+const dfContainer = document.getElementById("dataframe-container");
+let combinedHTML = tableHTML + buttonHTML;
+
+dfContainer.insertAdjacentHTML("beforeend", combinedHTML);
+
+ // Select all tables with IDs matching the pattern "page-X-table"
+var tables = document.querySelectorAll("[id^='page-'][id$='-table']");
+
+tables.forEach(function(table) {
+    // Select all cells in the table
+    var cells = table.querySelectorAll("td");
+
+    cells.forEach(function(cell) {
+        var content = cell.textContent;
+        
+        // Check if the content is an integer
+        if (!isNaN(content) && Number.isInteger(parseFloat(content))) {
+            var number = parseInt(content, 10);
+            // Format the number with thousands separators
+            cell.textContent = addThousandsSeparator(number);
+        }
+    });
+});
+    
+}
+else if (data.type === "check_results") {
+        const checkResults = data.result;
+        const page_number = checkResults.page_number;
+        const errors = checkResults.errors
+        const dataframe = JSON.parse(checkResults.dataframe);
+        console.log("dataframe inside check is ", dataframe)
+        updateTableWithData(dataframe, page_number);
+        const table = document.querySelector(`#page-${page_number}-table`);
+
+
+
+
+  if (table) {
+    const previousHighlightedCells = table.querySelectorAll("td");
+    previousHighlightedCells.forEach((cell) => {
+      cell.style.backgroundColor = "";
+  });
+
+  for (const error of errors) {
+        const resultArray = error.result_row;
+        console.log("the error is ", error)
+        console.log("result row is " ,resultArray)
+
+
+
+    resultArray.forEach((rowIndex) => {
+      const row = table.querySelector(`table tr:nth-child(${rowIndex +1})`);
+      console.log("Found row:", row);
+
+      if (row) {
+        const cells = row.querySelectorAll("td");
+        cells.forEach((cell) => {
+          cell.style.backgroundColor = "MistyRose";
+        }); 
+      }
+    });
+  }
+    }
+  }
+};
+function updateTableWithData(dataframe, pageNumber) {
+    const tableContainer = document.querySelector(`#page-${pageNumber}-container`);
+
+    if (tableContainer) {
+        // Clear existing table container
+        tableContainer.innerHTML = "";
+
+        // Create the card element
+        const card = document.createElement("div");
+        card.className = "container mt-4 card flex-fill";
+        card.id = `page-${pageNumber}-container`;
+        card.style="overflow-x: auto;"
+
+        // Create the card header
+        const cardHeader = document.createElement("div");
+        cardHeader.className = "card-header";
+
+        const headerTitle = document.createElement("h3");
+        headerTitle.style.paddingTop = "10px";
+        headerTitle.textContent = `Page ${pageNumber}`;
+
+        cardHeader.appendChild(headerTitle);
+
+        // Create the table element
+        const table = document.createElement("table");
+        table.id = `page-${pageNumber}-table`;
+        table.className = "table table-hover my-0";
+        table.style.paddingBottom = "10px";
+
+        // Create the table header row
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        Object.keys(dataframe).forEach((col) => {
+            const th = document.createElement("th");
+            th.textContent = col;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // Create the table body rows
+        const tbody = document.createElement("tbody");
+
+        Object.keys(dataframe[Object.keys(dataframe)[0]]).forEach((rowIndex) => {
+            const row = document.createElement("tr");
+
+            Object.keys(dataframe).forEach((col) => {
+                const td = document.createElement("td");
+                td.contentEditable = true;
+                td.className="cramped"
+                td.textContent = dataframe[col][rowIndex];
+                td.addEventListener("click", () => handleCellClick(td));
+                row.appendChild(td);
+            });
+
+            tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+
+        // Append elements to the card and card container
+        card.appendChild(cardHeader);
+        card.appendChild(table);
+        tableContainer.appendChild(card);
+    }
+}
+
+
+
+    
+    let lastClickedCell = null;
+
+    function handleCellClick(cell) {
+      lastClickedCell = cell;
+    }
+    function addRow(pageNumber) {
+      if (lastClickedCell) {
+        const table = document.getElementById(`page-${pageNumber}-table`);
+        const newRow = table.insertRow(lastClickedCell.parentNode.rowIndex + 1);
+        const numColumns = table.rows[0].cells.length;
+        for (let i = 0; i < numColumns; i++) {
+          const newCell = newRow.insertCell(i);
+          newCell.contentEditable = true;
+          newCell.innerText = 'New Value';
+          newCell.addEventListener('click', function() {
+            handleCellClick(newCell);
+          });
+        }
+      }
+}
+
+
+  function addColumn(pageNumber) {
+    if (lastClickedCell) {
+      const table = document.getElementById(`page-${pageNumber}-table`);
+      const colIndex = lastClickedCell.cellIndex;
+      for (let i = 0; i < table.rows.length; i++) {
+        const newCell = table.rows[i].insertCell(colIndex + 1);
+        newCell.contentEditable = true;
+        newCell.innerText = 'New Value';
+        newCell.addEventListener('click', function() {
+            handleCellClick(newCell);
+          });
+      }
+    }
+  }
+
+  function removeRow(pageNumber) {
+      if (lastClickedCell) {
+        const table = document.getElementById(`page-${pageNumber}-table`); 
+
+        const row = lastClickedCell.parentNode;
+        row.parentNode.removeChild(row);
+      }
+    }
+
+    function removeColumn(pageNumber) {
+      if (lastClickedCell) {
+        const table = document.getElementById(`page-${pageNumber}-table`); 
+        const colIndex = lastClickedCell.cellIndex;
+        for (let i = 0; i < table.rows.length; i++) {
+          table.rows[i].deleteCell(colIndex);
+        }
+      }
+    }
+
+
+      function collectCorrectedDataFromTable(pageNumber) {
+      const correctedData = [];
+      const table = document.getElementById(`page-${pageNumber}-table`); 
+      console.log("Page Number:", pageNumber); 
+      for (let row of table.rows) {
+          const rowData = [];
+          for (let cell of row.cells) {
+            console.log("cell value " , cell.textContent)
+            const cellValue = cell.textContent.trim() === 'New Value' ? '0' : cell.textContent;
+            rowData.push(cellValue);
+          }
+          correctedData.push(rowData);
+      }
+      const jsonData = JSON.stringify(correctedData);
+
+
+
+      return jsonData;
+  }
+
+async function sendCorrectedDataToBackend(correctedData, pageNumber) {
+    try {
+      const message = `corrected_data:${correctedData}:${pageNumber}`;
+    socket.send(message);
+    console.log(message)
+
+    } catch (error) {
+        console.error('Error sending data:', error);
+    }
+}
+
+
+    function validate(pageNumber) {
+        const correctedData = collectCorrectedDataFromTable(pageNumber);
+        sendCorrectedDataToBackend(correctedData, pageNumber);
+    }
+    function reinitialiser(pageNumber){
+      const dfContainer = document.getElementById(`page-${pageNumber}-container`);
+  if (dfContainer && dict[pageNumber]) {
+    dfContainer.innerHTML = dict[pageNumber];
+  }
+
+}
+
+function collectDataFromDataFrames(size) {
+    const data = [];
+
+    const totalPages = size; 
+    const totalPagess = document.querySelectorAll('[id^="page-"]').length;
+
+
+    for (let pageNumber = 0; pageNumber <= totalPagess; pageNumber++) {
+        const tableData = [];
+        const columnNames = [];
+
+
+        const tableId = `page-${pageNumber}-table`;
+        const table = document.getElementById(tableId);
+
+        if (table) {
+          for (let j = 0; j < table.rows[0].cells.length; j++) {
+                const columnName = table.rows[0].cells[j].textContent.trim();
+                columnNames.push(columnName);
+            }
+
+            for (let i = 1; i < table.rows.length; i++) {
+                const rowData = [];
+                for (let j = 0; j < table.rows[i].cells.length; j++) {
+                  const cellValue = table.rows[i].cells[j].textContent.trim() === 'New Value' ? '0' : table.rows[i].cells[j].textContent;
+                  rowData.push(cellValue);
+
+                  
+                                  }
+                tableData.push(rowData);
+            }
+
+            data.push({ page_number: pageNumber, data: tableData , column_name: columnNames});
+        }
+    }
+
+    return data;
+}
+
+async function sendDataToBackend(data ,municipalite , date) {
+      try {
+
+        const url = "/insert_doc"; 
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ data: data, municipalite: municipalite, date: date}),
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+
+            if (responseData.redirect_url) {
+                window.location.href = responseData.redirect_url;
+            } else {
+                console.log("Data sent successfully:", responseData);
+            }
+        } else {
+            console.error("Error sending data:", response.status, response.statusText);
+        }
+    } catch (error) {
+        console.error('Error sending data:', error);
+    }
+}
+
+function validerdoc(lastPageNumber,municipalite , date) {
+  const collectedData = collectDataFromDataFrames(lastPageNumber);
+  sendDataToBackend(collectedData , municipalite , date);
+
+}
+function addThousandsSeparator(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+       
+</script>
+
+{% endblock %}
+

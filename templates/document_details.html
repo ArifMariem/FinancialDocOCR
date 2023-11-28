@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}
+Les détails du compte financier
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Le compte financier</h2>
+    
+<div>
+
+    <div class="card flex-fill">
+        <div class="card-header">
+        </div>
+        <table class="table table-hover my-0">
+            <thead>
+                <tr>
+                    <th>Municipalité</th>
+                    <th class="d-none d-xl-table-cell">Date</th>
+                    <th class="d-none d-md-table-cell">Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ document.municipality }}</td>
+                    <td class="d-none d-xl-table-cell">{{ document.date }}</td>
+                    <td class="d-none d-md-table-cell">{{ document.utilisateur }}</td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% for page in document.pages %}
+    <div class="card flex-fill" >
+
+    <h3 style="padding-top: 10px;">Page : {{ page.pageNumber }}</h3>
+
+    <table class="table table-hover my-0" id="table_pages">
+        <thead>
+            <tr>
+                {% for column in page.columns %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in page.rows %}
+            <tr>
+                {% for column_name in page.columns %}
+                    <td>{{ row[column_name]}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+        
+    </table>
+    <script>
+        function addThousandsSeparator(input) {
+            if (typeof input === 'number') {
+                return input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            return input; 
+        }
+
+        var cells = document.querySelectorAll('tbody td');
+
+        cells.forEach(function(cell) {
+            cell.innerText = addThousandsSeparator(cell.innerText);
+        });
+    </script>
+</div>
+
+    {% endfor %}
+    <div style="text-align: center;">
+
+    <button id="insertButton" class="btn btn-secondary" onclick="exportExcel(event)">Exporter Excel</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.4/xlsx.full.min.js"></script>
+<script>
+    function exportExcel(event) {
+        event.preventDefault();
+        var wb = XLSX.utils.book_new();
+
+        var tables = document.querySelectorAll("table#table_pages");
+        console.log('tables ', tables)
+
+        tables.forEach(function (table, index) {
+            var ws_data = [];
+            
+            // Get headers from the first row (thead)
+            var headerRow = table.querySelector("thead tr");
+            var headerCells = headerRow.querySelectorAll("th");
+            var headerData = [];
+            headerCells.forEach(function (headerCell) {
+                headerData.push(headerCell.textContent);
+            });
+            ws_data.push(headerData);
+
+            // Get data from tbody
+            var rows = table.querySelectorAll("tbody tr");
+            rows.forEach(function (row) {
+                var rowData = [];
+                var cells = row.querySelectorAll("td");
+
+                cells.forEach(function (cell) {
+                    rowData.push(cell.textContent);
+                });
+
+                ws_data.push(rowData);
+            });
+
+            var ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet" + (index + 1));
+        });
+
+        XLSX.writeFile(wb, "exported_data.xlsx");
+    }
+</script>
+
+
+
+
+{% endblock %}
+{% block footer %}			
+			{% endblock %}
+
+           
