@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Responsive Admin &amp; Dashboard Template based on Bootstrap 5">
+	<meta name="author" content="AdminKit">
+	<meta name="keywords" content="adminkit, bootstrap, bootstrap 5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link rel="shortcut icon" href="img/icons/icon-48x48.png" />
+
+	<link rel="canonical" href="https://demo-basic.adminkit.io/pages-blank.html" />
+
+    <title>{% block title %}Home{% endblock %}</title>
+    <link href="/static/css/app.css" rel="stylesheet">
+	<style>
+	.btn-secondary {
+		background-color: #222e3c;
+		border-color: #222e3c; 
+		color: #ffffff;
+	  }
+	  footer.footer {
+  position: absolute;
+  bottom: 0;
+  left: calc(250px + 1rem);
+    right: 0;
+  background: #fff;
+  direction: ltr;
+  padding: 1rem 0.875rem;
+
+}
+h2{
+      padding-bottom:25px;
+    }
+
+
+
+	  
+	</style>
+	{% block static %}
+	{% endblock %}
+
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+	<div class="wrapper">
+		<nav id="sidebar" class="sidebar js-sidebar">
+			<div class="sidebar-content js-simplebar">
+				<a class="sidebar-brand" href="">
+          <span class="align-middle">Cours des Comptes</span>
+        </a>
+
+				<ul class="sidebar-nav">
+					<li class="sidebar-header">
+						Pages
+					</li>
+
+					<li class="sidebar-item {% if request.url.path == '/overview' %}active{% endif %}">
+						<a class="sidebar-link" href="/overview">
+							<i class="align-middle" data-feather="home"></i>
+							<span class="align-middle">Vue d'ensemble</span>
+							
+						</a>
+					</li>
+				
+				
+					<li class="sidebar-item {% if request.url.path == '/upload_pdf/' %}active{% endif %}">
+						<a class="sidebar-link" href="/upload_pdf">
+							<i class="align-middle" data-feather="share"></i>
+							<span class="align-middle">Télécharger Compte</span>
+						</a>
+					</li>
+
+					<li class="sidebar-item  {% if request.url.path == '/get_all_documents' %}active{% endif %}">
+						<a class="sidebar-link" href="/get_all_documents">
+              			<i class="align-middle" data-feather="book"></i> 
+						<span class="align-middle">Documents</span>
+            			</a>
+					</li>
+
+					{% if email == "admin@gmail.com" %}
+					<li class="sidebar-item  {% if request.url.path == '/all_user' %}active{% endif %}">
+
+						<a class="sidebar-link" href="/all_user">
+							<i class="align-middle" data-feather="user"></i> 
+							<span class="align-middle">Utilisateurs</span>
+						</a>
+					</li>
+
+					{% endif %}
+					
+					{% if email %}
+						<a class="sidebar-link" href="/logout">
+							<i class="align-middle" data-feather="log-out"></i> 
+							<span class="align-middle">Se deconnecter</span>
+						</a>
+						{% else %}
+						<a class="sidebar-link" href="/login">
+							<i class="align-middle" data-feather="log-in"></i> 
+							<span class="align-middle">Se connecter</span>
+						</a>
+						{% endif %}
+
+					
+					
+				
+		</nav>
+
+		<div class="main">
+			<nav class="navbar navbar-expand navbar-light navbar-bg">
+				<a class="sidebar-toggle js-sidebar-toggle">
+          <i class="hamburger align-self-center"></i>
+        </a>
+
+				<div class="navbar-collapse collapse">
+					<ul class="navbar-nav navbar-align">
+						<li class="nav-item dropdown">
+							<a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-bs-toggle="dropdown">
+								<div class="position-relative">
+									<i class="align-middle" data-feather="bell"></i>
+									<span class="indicator">4</span>
+								</div>
+							</a>
+							<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0" aria-labelledby="alertsDropdown">
+								<div class="dropdown-menu-header">
+									4 New Notifications
+								</div>
+								<div class="list-group">
+									
+									
+									
+									
+								</div>
+								<div class="dropdown-menu-footer">
+									<a href="#" class="text-muted">Show all notifications</a>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-icon dropdown-toggle" href="#" id="messagesDropdown" data-bs-toggle="dropdown">
+								<div class="position-relative">
+									<i class="align-middle" data-feather="message-square"></i>
+								</div>
+							</a>
+							<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0" aria-labelledby="messagesDropdown">
+								<div class="dropdown-menu-header">
+									<div class="position-relative">
+										4 New Messages
+									</div>
+								</div>
+								
+								<div class="dropdown-menu-footer">
+									<a href="#" class="text-muted">Show all messages</a>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
+                <i class="align-middle" data-feather="settings"></i>
+              </a>
+
+							<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+							 <span class="text-dark">{{email}}</span>
+								
+              </a>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a class="dropdown-item" href=""><i class="align-middle me-1" data-feather="user"></i> Profile</a>
+								<a class="dropdown-item" href=""><i class="align-middle me-1" data-feather="pie-chart"></i> Analytics</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href=""><i class="align-middle me-1" data-feather="settings"></i> Settings & Privacy</a>
+								<a class="dropdown-item" href=""><i class="align-middle me-1" data-feather="help-circle"></i> Help Center</a>
+								<div class="dropdown-divider"></div>
+								<a class="dropdown-item" href="/logout">Log out</a>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</nav>
+
+			<main>
+				<div class="container-fluid p-1">
+
+
+				{% block content %}{% endblock %}
+				</div>
+			</main>
+
+			{% block footer %}			
+
+			<footer class="footer">
+				<div class="container-fluid">
+					<div class="row text-muted">
+						<div class="col-6 text-start">
+							<p class="mb-0">
+								
+							</p>
+						</div>
+						<div class="col-6 text-end">
+							<ul class="list-inline">
+								<li class="list-inline-item">
+									<a class="text-muted" href="" target="_blank">Support</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="" target="_blank">Help Center</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="" target="_blank">Privacy</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="" target="_blank">Terms</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</footer>
+			{% endblock %}
+
+		</div>
+
+	</div>
+
+	<script src="/static/js/app.js"></script>
+
+
+</body>
+
+</html>

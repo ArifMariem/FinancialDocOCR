@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}
+Upload Page
+{% endblock %}  
+
+{% block static %}
+<style>
+    .center-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px; 
+    }
+    footer.footer {
+    position: fixed !important; 
+      bottom: 0 !important; 
+      right:  0 !important; 
+    background: #fff;
+      direction: ltr;
+      padding: 1rem 0.875rem;
+  
+  }
+  .main {
+  padding-bottom: 100px;
+}
+    
+    
+  </style>
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Etape 1 : Télécharger votre fichier</h2>
+    
+ 
+  <form method="post" enctype="multipart/form-data">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Municipalité</h5>
+      </div>
+      <div class="card-body">
+        <input type="text" class="form-control" name = "municipalite" placeholder="Municipalité" id="municipalite"  required>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Date</h5>
+      </div>
+      <div class="card-body">
+        <input type="date" class="form-control" name="date"  id="date" required>
+      </div>
+    </div>
+  <div>
+    <input type="file" class="form-control" name="pdf_file" accept=".pdf">
+    <div class="center-button">
+
+    <button type="submit" class="btn btn-secondary" >Visualiser pdf</button>
+    </div>
+  </form>
+
+  {% if file_url %}
+    <div class="container mt-4">
+      <iframe id="pdf-viewer" src="{{ file_url }}" style="width: 100%; height: 500px;"></iframe>
+      <form method="post" action="/validate_pdf/">
+        <input type="hidden" name="filename" value="{{ file_url }}">
+        <input type="hidden" name="municipalite" id="municipalite" value="{{municipalite}}">
+        <input type="hidden" name="date" id="date" value="{{date}}">
+        <div class="center-button">
+        <button type="submit" class="btn btn-secondary">Valider pdf</button>
+      </div>
+      </form>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  function showPDF(url) {
+      document.getElementById("pdf-viewer").setAttribute("src", url);
+  }
+
+
+
+  </script>
+
+
+
+{% endblock %}
